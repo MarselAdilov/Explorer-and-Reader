@@ -1,9 +1,9 @@
 ﻿//Working:
-//  -explorer(moving through directtories)
-//  - Command - exit
+//  - Explorer(moving through directtories)
+//  - Command -exit
 
-//Not working:
-//  -Command - open
+//Working not correct:
+//  - Command -open
 
 
 using System;
@@ -50,7 +50,7 @@ namespace Explorer_and_Reader
                 dirList[dirIndex++] = f.Name;
                 Console.WriteLine($"{dirIndex}.\t{f.Name,-50}\t{f.Length:#,#}");
             }
-            Console.WriteLine();
+            Console.WriteLine("\n<Введите номер или команду>");
         }
 
         private static void Intro() //вступительное сообщение
@@ -134,12 +134,26 @@ namespace Explorer_and_Reader
 
         private static void Open(int num = -1, string p = @"C:") //Открывает файлы и папки
         {
-            
-            try
+            if (num != -1) //открытие файла по числу
             {
-                if (num != -1)
-                    path[++pathIndex] = dirList[num];
-                else
+                try
+                {
+                    path[++pathIndex] = dirList[num]; //!!! выходит за границы массива 
+                    Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
+                    FileList(PathLinker(pathIndex));
+                }
+                catch
+                {
+                    Console.WriteLine($"Ошибка: невозможно открыть {PathLinker(pathIndex)}");
+                    Console.WriteLine($"Нажмите [Enter] для продолжения...");
+                    Console.ReadLine();
+                    --pathIndex;
+                    FileList(PathLinker(pathIndex));
+                }
+            }
+            else //открытие файла по пути
+            {
+                try
                 {
                     // сделать резервную копию "path[]" и "pathIndex" на случай ошибки открытия
                     pathBackup = path;
@@ -147,22 +161,20 @@ namespace Explorer_and_Reader
                     // разделить путь "р" на состовляющие и узнать новый "pathIndex"
                     // записать поверх путь из "р" в "path[]"
                     path = p.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string s in path) Console.WriteLine(s);
-                    pathIndex = path.Length;
-                    Console.WriteLine(pathIndex);
-                    // и тогда можно заменить ((num != -1)?PathLinker(pathIndex):p) на PathLinker(pathIndex)
-                }
+                    pathIndex = path.Length - 1;
 
-                Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
-                FileList(PathLinker(pathIndex));
-            }
-            catch
-            {
-                Console.WriteLine($"Ошибка: невозможно открыть {PathLinker(pathIndex)}");
-                Console.WriteLine($"Нажмите [Enter] для продолжения...");
-                Console.ReadLine();
-                if(num != -1) --pathIndex;
-                FileList(PathLinker(pathIndex));
+                    Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
+                    FileList(PathLinker(pathIndex));
+                }
+                catch
+                {
+                    Console.WriteLine($"Ошибка: невозможно открыть {p}");
+                    Console.WriteLine($"Нажмите [Enter] для продолжения...");
+                    Console.ReadLine();
+                    path = pathBackup;
+                    pathIndex = pathIndexBackup;
+                    FileList(PathLinker(pathIndex));
+                }
             }
         }
 
