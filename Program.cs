@@ -23,13 +23,13 @@ namespace Explorer_and_Reader
         private static int pathIndex = 0; // хранит кол-во объектов в пути
         private static int pathIndexBackup = 0; // копия pathIndex на случай ошибки, дающая возможность отката
         private static string[] dirList; // хранит список файлов в текущем каталоге
-        private static int dirIndex = 1; // кол-во файлов в текущем каталоге
+        private static int dirIndex = 0; // кол-во файлов в текущем каталоге
         private static string command; // хранит прописанную с командной строки команду
         private static bool status = true; // пока true, цикл обработки запросов работает
 
         private static void FileList(string path) //выводит список файлов в директории
         {
-            dirIndex = 1;
+            dirIndex = 0;
             Console.WriteLine($"\n>>>\t{path}\t<<<\n");
             DirectoryInfo dInfo = new DirectoryInfo(path);
             DirectoryInfo[] dir = dInfo.GetDirectories();
@@ -41,14 +41,14 @@ namespace Explorer_and_Reader
 
             foreach (var d in dir)
             {
-                dirList[dirIndex] = d.Name;
-                Console.WriteLine($"{dirIndex++}.\t[{d.Name.ToUpper() + "]",-50}");
+                dirList[dirIndex++] = d.Name;
+                Console.WriteLine($"{dirIndex}.\t[{d.Name.ToUpper() + "]",-50}");
             }
 
             foreach (var f in spisok)
             {
-                dirList[dirIndex] = f.Name;
-                Console.WriteLine($"{dirIndex++}.\t{f.Name,-50}\t{f.Length:#,#}");
+                dirList[dirIndex++] = f.Name;
+                Console.WriteLine($"{dirIndex}.\t{f.Name,-50}\t{f.Length:#,#}");
             }
             Console.WriteLine();
         }
@@ -100,9 +100,9 @@ namespace Explorer_and_Reader
                     try
                     {
                         int num = Convert.ToInt32(command);
-                        if (num <= dirIndex-1 && num > 0)
+                        if (num <= dirIndex && num > 0)
                         {
-                            Open(num);
+                            Open(num-1);
                             return;
                         }
                         else if (num == 0 && PathLinker(pathIndex) != @"C:\") // "назад"
