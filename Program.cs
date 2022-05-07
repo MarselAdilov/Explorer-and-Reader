@@ -1,4 +1,11 @@
-﻿using System;
+﻿//Working:
+//  -explorer(moving through directtories)
+//  - Command - exit
+
+//Not working:
+//  -Command - open
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
