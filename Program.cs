@@ -149,9 +149,22 @@ namespace Explorer_and_Reader
             {
                 try
                 {
-                    path[++pathIndex] = dirList[num]; //!!! выходит за границы массива 
+                    path[++pathIndex] = dirList[num];
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
-                    FileList(PathLinker(pathIndex));
+
+                    // проверяем на поддерживаемый файл для открытия
+                    if (dirList[num].EndsWith(".txt") || dirList[num].EndsWith(".log"))
+                    {
+                        OpenFile();
+                        Console.WriteLine($"\nНажмите [Enter] для продолжения...");
+                        Console.ReadLine();
+                        FileList(PathLinker(--pathIndex));
+                        return;
+                    }
+                    else
+                    {
+                        FileList(PathLinker(pathIndex));
+                    }
                 }
                 catch
                 {
@@ -181,7 +194,22 @@ namespace Explorer_and_Reader
                     }
 
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
-                    FileList(PathLinker(pathIndex));
+
+                    // проверяем на поддерживаемый файл для открытия
+                    if (path[pathIndex].EndsWith(".txt") || path[pathIndex].EndsWith(".log"))
+                    {
+                        OpenFile();
+                        Console.WriteLine($"\nНажмите [Enter] для продолжения...");
+                        Console.ReadLine();
+                        path = pathBackup;
+                        pathIndex = pathIndexBackup;
+                        FileList(PathLinker(pathIndex));
+                        return;
+                    }
+                    else
+                    {
+                        FileList(PathLinker(pathIndex));
+                    }
                 }
                 catch
                 {
@@ -195,6 +223,24 @@ namespace Explorer_and_Reader
             }
         }
 
+        private static void OpenFile(int codePage = 65001) //Выводит текстовые файлы на консоль
+        {
+            string fName = path[pathIndex];
+            string filePath = PathLinker(pathIndex).TrimEnd('\\');
+            // страница 1251 имеет имя "windows-1251", а страница 866 – "cp866" и, соответственно, 65001 – "UTF-8".
+            Console.WriteLine($"\n>>>\tФайл: {fName}\t|\tКодировка: {codePage}\t<<<\n");
+            try
+            {
+                StreamReader fStr = new StreamReader(filePath, Encoding.GetEncoding(codePage));
+                string s;
+                while ((s = fStr.ReadLine()) != null) Console.WriteLine(s);
+                fStr.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Ошибка открытия файла: {e.Message}");
+            }
+        }
         private static string PathLinker(int i) //собирает путь воедино
         {
             string pathLinked = "";
