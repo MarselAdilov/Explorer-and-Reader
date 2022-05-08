@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--Библиографическая карточка-->
+<Описание>
+  <Автор>
+    <FirstName>Аркадий</FirstName>
+    <LastName>Стругацкий</LastName>
+  </Автор>
+  <Автор>
+    <FirstName>Борис</FirstName>
+    <LastName>Стругацкий</LastName>
+  </Автор>
+  <Заголовок>Трудно быть богом</Заголовок>
+</Описание>

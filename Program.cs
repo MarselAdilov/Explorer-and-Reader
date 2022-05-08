@@ -62,12 +62,12 @@ namespace Explorer_and_Reader
             Console.WriteLine("+-------------------------------------+-------------------------------------+\n");
             Pause();
             FileList(PathLinker(pathIndex));
-            
+
         }
 
         private static void Request(string command) //обрабатывает введенную команду
         {
-            try 
+            try
             {
                 char symbol = command[0];
 
@@ -84,7 +84,7 @@ namespace Explorer_and_Reader
                         if (tmp.Length > 2) //если задана кодировка
                         {
                             try //если задан файл числом
-                            {  
+                            {
                                 Open(Convert.ToInt32(tmp[1]) - 1, null, Convert.ToInt32(tmp[2]));
                             }
                             catch //если задан путь
@@ -122,7 +122,7 @@ namespace Explorer_and_Reader
                         int num = Convert.ToInt32(command);
                         if (num <= dirIndex && num > 0)
                         {
-                            Open(num-1);
+                            Open(num - 1);
                             return;
                         }
                         else if (num == 0 && PathLinker(pathIndex) != @"C:\") // "назад"
@@ -144,12 +144,12 @@ namespace Explorer_and_Reader
                     }
                 }
             }
-            catch 
+            catch
             {
                 Console.WriteLine("Ошибка. Попробуйте снова.");
                 return;
             }
-            
+
         }
 
         private static void Open(int num = -1, string p = @"C:", int codePage = 65001) //Открывает файлы и папки
@@ -162,7 +162,14 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (dirList[num].ToLower().EndsWith(".txt") || dirList[num].ToLower().EndsWith(".log"))
+                    if (path[pathIndex].ToLower().EndsWith(".txt") ||
+                        path[pathIndex].ToLower().EndsWith(".log") ||
+                        path[pathIndex].ToLower().EndsWith(".md") ||
+                        path[pathIndex].ToLower().EndsWith(".cs") ||
+                        path[pathIndex].ToLower().EndsWith(".c") ||
+                        path[pathIndex].ToLower().EndsWith(".cpp") ||
+                        path[pathIndex].ToLower().EndsWith(".html") ||
+                        path[pathIndex].ToLower().EndsWith(".xml"))
                     {
                         OpenFile(codePage);
                         Pause();
@@ -203,7 +210,14 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (path[pathIndex].ToLower().EndsWith(".txt") || path[pathIndex].ToLower().EndsWith(".log"))
+                    if (path[pathIndex].ToLower().EndsWith(".txt") ||
+                        path[pathIndex].ToLower().EndsWith(".log") ||
+                        path[pathIndex].ToLower().EndsWith(".md") ||
+                        path[pathIndex].ToLower().EndsWith(".cs") ||
+                        path[pathIndex].ToLower().EndsWith(".c") ||
+                        path[pathIndex].ToLower().EndsWith(".cpp") ||
+                        path[pathIndex].ToLower().EndsWith(".html") ||
+                        path[pathIndex].ToLower().EndsWith(".xml"))
                     {
                         OpenFile(codePage);
                         Pause();
@@ -249,7 +263,7 @@ namespace Explorer_and_Reader
         private static string PathLinker(int i) //собирает путь воедино
         {
             string pathLinked = "";
-            for (int j = 0; j <= i; j++) pathLinked = pathLinked + path[j]+@"\";
+            for (int j = 0; j <= i; j++) pathLinked = pathLinked + path[j] + @"\";
             return pathLinked;
         }
 
