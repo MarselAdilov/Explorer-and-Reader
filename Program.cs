@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
+using System.Xml.Linq;
+using System.Xml;
 
 namespace Explorer_and_Reader
 {
@@ -245,26 +247,57 @@ namespace Explorer_and_Reader
         private static void OpenFile(int codePage = 65001) //Выводит текстовые файлы на консоль
         {
             string fName = path[pathIndex];
+            string[] fFormat = fName.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             string filePath = PathLinker(pathIndex).TrimEnd('\\');
             // страница 1251 имеет имя "windows-1251", а страница 866 – "cp866" и, соответственно, 65001 – "UTF-8".
             Console.WriteLine($"\n>>>\tФайл: {fName}\t|\tКодировка: {codePage}\t<<<\n");
             try
             {
-                StreamReader fStr = new StreamReader(filePath, Encoding.GetEncoding(codePage));
-                string s;
-                while ((s = fStr.ReadLine()) != null) Console.WriteLine(s);
-                fStr.Close();
+                switch (fFormat.Last())
+                {
+                    case "xml":
+                        XDocument xmlBook = XDocument.Load(filePath);
+                        Console.WriteLine(xmlBook.Declaration);
+                        foreach (XNode element in xmlBook.Nodes()) OpenXML(element);
+                        break;
+                    default:
+                        StreamReader fStr = new StreamReader(filePath, Encoding.GetEncoding(codePage));
+                        string s;
+                        while ((s = fStr.ReadLine()) != null) Console.WriteLine(s);
+                        fStr.Close();
+                        break;
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Ошибка открытия файла: {e.Message}");
             }
         }
+
         private static string PathLinker(int i) //собирает путь воедино
         {
             string pathLinked = "";
             for (int j = 0; j <= i; j++) pathLinked = pathLinked + path[j] + @"\";
             return pathLinked;
+        }
+
+        private static void OpenXML(XNode node)
+        {
+            if (node.NodeType == XmlNodeType.Comment)
+            { Console.WriteLine(node); return; }
+            XElement e = (XElement)node;
+            Console.Write($"{e.Name} : ");
+            if (!e.HasElements)//Если элемент не имеет дочерних элементов
+            {
+                Console.WriteLine(e.Value);   //вывод элемента
+                if (e.HasAttributes)          //и его атрибутов
+                    foreach (var at in e.Attributes()) Console.WriteLine(at);
+            }
+            else
+            {
+                Console.WriteLine();
+                foreach (var nd in e.Nodes()) OpenXML(nd);
+            }
         }
 
         private static void Pause() //функция паузы
