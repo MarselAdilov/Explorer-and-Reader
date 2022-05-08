@@ -2,6 +2,8 @@
 //  - Explorer(moving through directtories)
 //  - Command -exit
 //  - Command -open
+//  - Command -top
+//  - Command -cur
 
 
 using System;
@@ -63,6 +65,7 @@ namespace Explorer_and_Reader
             Console.WriteLine("| · Открыть файл с кодировкой         | -openen [path] [page_code]          |");
             Console.WriteLine("| · Выйти из программы                | -exit                               |");
             Console.WriteLine("| · Перейти к текущему каталогу       | -cur                                |");
+            Console.WriteLine("| · Перейти к корневой папке          | -top                                |");
             Console.WriteLine("+-------------------------------------+-------------------------------------+\n");
 
             FileList(PathLinker(pathIndex));
@@ -85,6 +88,16 @@ namespace Explorer_and_Reader
                     else if (command.StartsWith("-open"))
                     {
                         Open(-1, command.Substring(6));
+                        return;
+                    }
+                    else if (command.StartsWith("-top"))
+                    {
+                        Open(-1);
+                        return;
+                    }
+                    else if (command.StartsWith("-cur"))
+                    {
+                        Open(-1, Directory.GetCurrentDirectory());
                         return;
                     }
                     else
@@ -136,8 +149,6 @@ namespace Explorer_and_Reader
             {
                 try
                 {
-                    Console.WriteLine($"path {path.Length}\t dirList {dirList.Length}");
-                    Console.WriteLine($"pathIndex {1+pathIndex}\t num {num}");
                     path[++pathIndex] = dirList[num]; //!!! выходит за границы массива 
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
                     FileList(PathLinker(pathIndex));
