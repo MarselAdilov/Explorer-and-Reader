@@ -62,7 +62,7 @@ namespace Explorer_and_Reader
             Console.WriteLine("|               Команда               |                  Код                |");
             Console.WriteLine("+-------------------------------------+-------------------------------------+");
             Console.WriteLine("| · Открыть                           | -open [path]                        |");
-            Console.WriteLine("| · Открыть файл с кодировкой         | -openen [path] [page_code]          |");
+            Console.WriteLine("| · Открыть файл с кодировкой         | -open [path / number] [page_code]   |");
             Console.WriteLine("| · Выйти из программы                | -exit                               |");
             Console.WriteLine("| · Перейти к текущему каталогу       | -cur                                |");
             Console.WriteLine("| · Перейти к корневой папке          | -top                                |");
@@ -87,8 +87,25 @@ namespace Explorer_and_Reader
                     }
                     else if (command.StartsWith("-open"))
                     {
-                        Open(-1, command.Substring(6));
-                        return;
+                        try //если кодировка не задана
+                        {
+                            string[] tmp = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            Open(-1, tmp[1]);
+                            return;
+                        }
+                        catch //если задана кодировка
+                        {
+                            string[] tmp = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            try //если задан путь
+                            {
+                                Open(-1, tmp[1], Int32.Parse(tmp[2]));
+                            }
+                            catch //если задан файл числом
+                            {
+                                Open(Int32.Parse(tmp[1]), null, Int32.Parse(tmp[2]));
+                            }
+                            return;
+                        }
                     }
                     else if (command.StartsWith("-top"))
                     {
@@ -143,7 +160,7 @@ namespace Explorer_and_Reader
             
         }
 
-        private static void Open(int num = -1, string p = @"C:") //Открывает файлы и папки
+        private static void Open(int num = -1, string p = @"C:", int codePage = 65001) //Открывает файлы и папки
         {
             if (num != -1) //открытие файла по числу
             {
@@ -155,7 +172,7 @@ namespace Explorer_and_Reader
                     // проверяем на поддерживаемый файл для открытия
                     if (dirList[num].EndsWith(".txt") || dirList[num].EndsWith(".log"))
                     {
-                        OpenFile();
+                        OpenFile(codePage);
                         Console.WriteLine($"\nНажмите [Enter] для продолжения...");
                         Console.ReadLine();
                         FileList(PathLinker(--pathIndex));
