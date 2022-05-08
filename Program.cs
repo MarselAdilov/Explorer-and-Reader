@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -172,7 +171,8 @@ namespace Explorer_and_Reader
                         path[pathIndex].ToLower().EndsWith(".c") ||
                         path[pathIndex].ToLower().EndsWith(".cpp") ||
                         path[pathIndex].ToLower().EndsWith(".html") ||
-                        path[pathIndex].ToLower().EndsWith(".xml"))
+                        path[pathIndex].ToLower().EndsWith(".xml") ||
+                        path[pathIndex].ToLower().EndsWith(".fb2"))
                     {
                         OpenFile(codePage);
                         Pause();
@@ -220,7 +220,8 @@ namespace Explorer_and_Reader
                         path[pathIndex].ToLower().EndsWith(".c") ||
                         path[pathIndex].ToLower().EndsWith(".cpp") ||
                         path[pathIndex].ToLower().EndsWith(".html") ||
-                        path[pathIndex].ToLower().EndsWith(".xml"))
+                        path[pathIndex].ToLower().EndsWith(".xml") ||
+                        path[pathIndex].ToLower().EndsWith(".fb2"))
                     {
                         OpenFile(codePage);
                         Pause();
@@ -260,6 +261,62 @@ namespace Explorer_and_Reader
                         XDocument xmlBook = XDocument.Load(filePath);
                         Console.WriteLine(xmlBook.Declaration);
                         foreach (XNode element in xmlBook.Nodes()) OpenXML(element);
+                        break;
+                    case "fb2":
+                        XElement doc = XElement.Load(filePath);
+                        string lastName = null, firstName = null,
+                              title = null, sequence = null, annotation = null, id = null;
+                        string[] genre = new string[10];
+                        int genreIndex = 0;
+                        
+                        var query = doc.Elements().First(x =>
+                          x.Name.LocalName == "description").Elements().First(
+                                x => x.Name.LocalName == "title-info").Elements();
+                        foreach (var element in query)
+                        {
+                            switch (element.Name.LocalName)
+                            {
+
+                                case "genre": genre[genreIndex++] = element.Value; break;
+                                case "author"://Извлекаем элементы этого узла
+                                    foreach (var el in element.Elements())
+                                    {
+                                        switch (el.Name.LocalName)
+                                        {
+                                            case "last-name": lastName = el.Value; break;
+                                            case "first-name": firstName = el.Value; break;
+                                            default: break;
+                                        }
+                                    }
+                                    break;
+                                case "book-title": title = element.Value; break;
+                                //Наименование серии – атрибут элемента sequence
+                                case "sequence":
+                                    sequence = element.Attribute("name").Value;
+                                    break;
+                                case "annotation": annotation = element.Value; break;
+                                default: break;
+                            }
+                        }
+
+                        var query1 = doc.Elements().First(x =>
+                            x.Name.LocalName == "description").Elements().First(
+                            x => x.Name.LocalName == "document-info").Elements();
+                        foreach (var element in query1)
+                        {
+                            switch (element.Name.LocalName)
+                            {
+                                case "id": id = element.Value; break;
+                            }
+                        }
+
+                        //Вывод "шапки"
+                        Console.Write($"Тематика: ");
+                        for (int g=0; g<genreIndex; g++)
+                            Console.Write($"{genre[g]} ");
+                        Console.WriteLine($"\nАвтор: " +
+                            $"{lastName} {firstName}\nНазвание: {title}\n" +
+                            $"Серия: {sequence}\nАннотация: {annotation}\nid: {id}\n");
                         break;
                     default:
                         StreamReader fStr = new StreamReader(filePath, Encoding.GetEncoding(codePage));
