@@ -1,0 +1,16 @@
+Genre:	prose_counter
+Genre:	humor_prose
+Author:	Михаил Шильман
+Title:	Евангелие от митьков
+Date:	1990
+
+=======================================
+
+Genre:	drama
+Genre:	humor
+Author:	Тигр Тонкий
+Title:	Охота на мамонтов
+Date:	2009
+
+=======================================
+

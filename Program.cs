@@ -262,17 +262,21 @@ namespace Explorer_and_Reader
                         Console.WriteLine(xmlBook.Declaration);
                         foreach (XNode element in xmlBook.Nodes()) OpenXML(element);
                         break;
+
                     case "fb2":
                         XElement doc = XElement.Load(filePath);
+
+                        //Вывод "шапки"
                         string lastName = null, firstName = null,
-                              title = null, sequence = null, annotation = null, id = null;
+                              title = null, sequence = null, annotation = null,
+                              year = null, id = null;
                         string[] genre = new string[10];
                         int genreIndex = 0;
                         
-                        var query = doc.Elements().First(x =>
+                        var titleinfo = doc.Elements().First(x =>
                           x.Name.LocalName == "description").Elements().First(
                                 x => x.Name.LocalName == "title-info").Elements();
-                        foreach (var element in query)
+                        foreach (var element in titleinfo)
                         {
                             switch (element.Name.LocalName)
                             {
@@ -290,6 +294,7 @@ namespace Explorer_and_Reader
                                     }
                                     break;
                                 case "book-title": title = element.Value; break;
+                                case "date": year = element.Value; break;
                                 //Наименование серии – атрибут элемента sequence
                                 case "sequence":
                                     sequence = element.Attribute("name").Value;
@@ -299,10 +304,10 @@ namespace Explorer_and_Reader
                             }
                         }
 
-                        var query1 = doc.Elements().First(x =>
+                        var documentinfo = doc.Elements().First(x =>
                             x.Name.LocalName == "description").Elements().First(
                             x => x.Name.LocalName == "document-info").Elements();
-                        foreach (var element in query1)
+                        foreach (var element in documentinfo)
                         {
                             switch (element.Name.LocalName)
                             {
@@ -310,14 +315,157 @@ namespace Explorer_and_Reader
                             }
                         }
 
-                        //Вывод "шапки"
                         Console.Write($"Тематика: ");
                         for (int g=0; g<genreIndex; g++)
                             Console.Write($"{genre[g]} ");
                         Console.WriteLine($"\nАвтор: " +
                             $"{lastName} {firstName}\nНазвание: {title}\n" +
-                            $"Серия: {sequence}\nАннотация: {annotation}\nid: {id}\n");
+                            $"Серия: {sequence}\nАннотация: {annotation}\nДата: {year}\nid: {id}\n");
+
+                        //Вывод "тушки"
+                        var body = doc.Elements().First(x =>
+                            x.Name.LocalName == "body").Elements();
+                        foreach (var item in body)
+                        {
+                            if (item.Name.LocalName == "section") //section
+                                foreach (var el in item.Elements())
+                                {
+                                    switch (el.Name.LocalName)
+                                    {
+                                        case "title":
+                                            foreach (var el_title in el.Elements())
+                                            {
+                                                if (el_title.Name.LocalName == "p")
+                                                    Console.WriteLine($"\t{el_title.Value.ToUpper()}");
+                                            }
+                                            break;
+                                        case "epigraph":
+                                            foreach (var el_epigraph in el.Elements())
+                                            {
+                                                if (el_epigraph.Name.LocalName == "p")
+                                                    Console.WriteLine(el_epigraph.Value);
+                                            }
+                                            break;
+                                        case "cite":
+                                            foreach (var el_cite in el.Elements())
+                                            {
+                                                if (el_cite.Name.LocalName == "p")
+                                                    Console.WriteLine(el_cite.Value);
+                                            }
+                                            break;
+                                        case "p": Console.WriteLine($"   {el.Value}"); break;
+                                        case "empty-line": Console.WriteLine("\n"); break;
+                                        case "empty-line/": Console.WriteLine("\n"); break;
+                                        default: break;
+                                    }
+                                }
+
+                            if (item.Name.LocalName == "title")
+                            {
+                                foreach (var el_title in item.Elements())
+                                {
+                                    if (el_title.Name.LocalName == "p")
+                                        Console.WriteLine($"\t{el_title.Value.ToUpper()}");
+                                }
+                            }
+                            if (item.Name.LocalName == "epigraph")
+                            {
+                                foreach (var el_epigraph in item.Elements())
+                                {
+                                    if (el_epigraph.Name.LocalName == "p")
+                                        Console.WriteLine(el_epigraph.Value);
+                                }
+                            }
+                            if (item.Name.LocalName == "cite")
+                            {
+                                foreach (var el_cite in item.Elements())
+                                {
+                                    if (el_cite.Name.LocalName == "p")
+                                        Console.WriteLine(el_cite.Value);
+                                }
+                            }
+
+                            if (item.Name.LocalName == "p")
+                                Console.WriteLine(item.Value);
+                            if (item.Name.LocalName == "empty-line")
+                                Console.WriteLine(item.Value);
+                            if (item.Name.LocalName == "empty-line/")
+                                Console.WriteLine(item.Value);
+                        }
                         break;
+
+                    case "html":
+                        XElement dochtml = XElement.Load(filePath);
+                        var html = dochtml.Elements();
+                        foreach (var item in html)
+                        {
+                            if (item.Name.LocalName == "head")
+                            {
+                                Console.Write($"Заголовок: ");
+                                foreach (var el_title in item.Elements())
+                                {
+                                    if (el_title.Name.LocalName == "title")
+                                        Console.WriteLine($"{el_title.Value}");
+                                }
+                            }
+                            Console.Write("\n\n");
+
+                            if (item.Name.LocalName == "body")
+                            {
+                                foreach (var el in item.Elements())
+                                {
+                                    switch (el.Name.LocalName)
+                                    {
+                                        case "section":
+                                            foreach (var el_section in el.Elements())
+                                            {
+                                                if (el_section.Name.LocalName == "p")
+                                                    Console.WriteLine($"   {el_section.Value}");
+                                                if (el_section.Name.LocalName == "h1")
+                                                    Console.WriteLine($"\t\t{el_section.Value.ToUpper()}");
+                                                if (el_section.Name.LocalName == "h2")
+                                                    Console.WriteLine($"\t{el_section.Value.ToUpper()}");
+                                                if (el_section.Name.LocalName == "h3")
+                                                    Console.WriteLine($"\t{el_section.Value}");
+                                            }
+                                            break;
+                                        case "table":
+                                            foreach (var el_table in el.Elements()) // строчки
+                                            {
+                                                foreach (var el_tr in el_table.Elements()) // столбцы
+                                                {
+                                                    Console.Write($"{el_tr.Value}\t");
+                                                }
+                                                Console.Write("\n");
+                                            }
+                                            break;
+                                        case "ul":
+                                            foreach (var el_ul in el.Elements())
+                                            {
+                                                if (el_ul.Name.LocalName == "li")
+                                                    Console.WriteLine($"   · {el_ul.Value}");
+                                            }
+                                            break;
+                                        case "p": Console.WriteLine($"   {el.Value}"); break;
+                                        case "h1": Console.WriteLine($"\t\t{el.Value.ToUpper()}"); break;
+                                        case "h2": Console.WriteLine($"\t{el.Value.ToUpper()}"); break;
+                                        case "h3": Console.WriteLine($"\t{el.Value}"); break;
+                                        default: break;
+                                    }
+                                }
+                            }
+
+                            if (item.Name.LocalName == "p")
+                                Console.WriteLine($"   {item.Value}");
+                            if (item.Name.LocalName == "h1")
+                                Console.WriteLine($"\t\t{item.Value.ToUpper()}");
+                            if (item.Name.LocalName == "h2")
+                                Console.WriteLine($"\t{item.Value.ToUpper()}");
+                            if (item.Name.LocalName == "h3")
+                                Console.WriteLine($"\t{item.Value}");
+                        }
+                        break;
+
                     default:
                         StreamReader fStr = new StreamReader(filePath, Encoding.GetEncoding(codePage));
                         string s;
