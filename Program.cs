@@ -1,12 +1,4 @@
-﻿//Working:
-//  - Explorer(moving through directtories)
-//  - Command -exit
-//  - Command -open
-//  - Command -top
-//  - Command -cur
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,13 +53,14 @@ namespace Explorer_and_Reader
             Console.WriteLine("+-------------------------------------+-------------------------------------+");
             Console.WriteLine("|               Команда               |                  Код                |");
             Console.WriteLine("+-------------------------------------+-------------------------------------+");
-            Console.WriteLine("| · Открыть                           | -open [path]                        |");
+            Console.WriteLine("| · Открыть файл из списка            | <номер файла>                       |");
+            Console.WriteLine("| · Открыть путь                      | -open [path]                        |");
             Console.WriteLine("| · Открыть файл с кодировкой         | -open [path / number] [page_code]   |");
             Console.WriteLine("| · Выйти из программы                | -exit                               |");
             Console.WriteLine("| · Перейти к текущему каталогу       | -cur                                |");
             Console.WriteLine("| · Перейти к корневой папке          | -top                                |");
             Console.WriteLine("+-------------------------------------+-------------------------------------+\n");
-
+            Pause();
             FileList(PathLinker(pathIndex));
             
         }
@@ -87,23 +80,22 @@ namespace Explorer_and_Reader
                     }
                     else if (command.StartsWith("-open"))
                     {
-                        try //если кодировка не задана
+                        string[] tmp = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (tmp.Length > 2) //если задана кодировка
                         {
-                            string[] tmp = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            Open(-1, tmp[1]);
+                            try //если задан файл числом
+                            {  
+                                Open(Convert.ToInt32(tmp[1]) - 1, null, Convert.ToInt32(tmp[2]));
+                            }
+                            catch //если задан путь
+                            {
+                                Open(-1, tmp[1], Convert.ToInt32(tmp[2]));
+                            }
                             return;
                         }
-                        catch //если задана кодировка
+                        else //если кодировка не задана
                         {
-                            string[] tmp = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            try //если задан путь
-                            {
-                                Open(-1, tmp[1], Int32.Parse(tmp[2]));
-                            }
-                            catch //если задан файл числом
-                            {
-                                Open(Int32.Parse(tmp[1]), null, Int32.Parse(tmp[2]));
-                            }
+                            Open(-1, tmp[1]);
                             return;
                         }
                     }
@@ -170,11 +162,10 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (dirList[num].EndsWith(".txt") || dirList[num].EndsWith(".log"))
+                    if (dirList[num].EndsWith(".txt") || dirList[num].EndsWith(".log") || path[pathIndex].EndsWith(".LOG") || path[pathIndex].EndsWith(".TXT"))
                     {
                         OpenFile(codePage);
-                        Console.WriteLine($"\nНажмите [Enter] для продолжения...");
-                        Console.ReadLine();
+                        Pause();
                         FileList(PathLinker(--pathIndex));
                         return;
                     }
@@ -186,8 +177,7 @@ namespace Explorer_and_Reader
                 catch
                 {
                     Console.WriteLine($"Ошибка: невозможно открыть {PathLinker(pathIndex)}");
-                    Console.WriteLine($"Нажмите [Enter] для продолжения...");
-                    Console.ReadLine();
+                    Pause();
                     --pathIndex;
                     FileList(PathLinker(pathIndex));
                 }
@@ -213,11 +203,10 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (path[pathIndex].EndsWith(".txt") || path[pathIndex].EndsWith(".log"))
+                    if (path[pathIndex].EndsWith(".txt") || path[pathIndex].EndsWith(".log") || path[pathIndex].EndsWith(".LOG") || path[pathIndex].EndsWith(".TXT"))
                     {
-                        OpenFile();
-                        Console.WriteLine($"\nНажмите [Enter] для продолжения...");
-                        Console.ReadLine();
+                        OpenFile(codePage);
+                        Pause();
                         path = pathBackup;
                         pathIndex = pathIndexBackup;
                         FileList(PathLinker(pathIndex));
@@ -231,8 +220,7 @@ namespace Explorer_and_Reader
                 catch
                 {
                     Console.WriteLine($"Ошибка: невозможно открыть {p}");
-                    Console.WriteLine($"Нажмите [Enter] для продолжения...");
-                    Console.ReadLine();
+                    Pause();
                     path = pathBackup;
                     pathIndex = pathIndexBackup;
                     FileList(PathLinker(pathIndex));
@@ -263,6 +251,12 @@ namespace Explorer_and_Reader
             string pathLinked = "";
             for (int j = 0; j <= i; j++) pathLinked = pathLinked + path[j]+@"\";
             return pathLinked;
+        }
+
+        private static void Pause() //функция паузы
+        {
+            Console.WriteLine($"\nНажмите [Enter] для продолжения...");
+            Console.ReadLine();
         }
 
         static void Main(string[] args)
