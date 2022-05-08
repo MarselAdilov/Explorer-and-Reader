@@ -162,7 +162,7 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (dirList[num].EndsWith(".txt") || dirList[num].EndsWith(".log") || path[pathIndex].EndsWith(".LOG") || path[pathIndex].EndsWith(".TXT"))
+                    if (dirList[num].ToLower().EndsWith(".txt") || dirList[num].ToLower().EndsWith(".log"))
                     {
                         OpenFile(codePage);
                         Pause();
@@ -203,7 +203,7 @@ namespace Explorer_and_Reader
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
 
                     // проверяем на поддерживаемый файл для открытия
-                    if (path[pathIndex].EndsWith(".txt") || path[pathIndex].EndsWith(".log") || path[pathIndex].EndsWith(".LOG") || path[pathIndex].EndsWith(".TXT"))
+                    if (path[pathIndex].ToLower().EndsWith(".txt") || path[pathIndex].ToLower().EndsWith(".log"))
                     {
                         OpenFile(codePage);
                         Pause();
