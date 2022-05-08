@@ -1,8 +1,6 @@
 ﻿//Working:
 //  - Explorer(moving through directtories)
 //  - Command -exit
-
-//Working not correct:
 //  - Command -open
 
 
@@ -138,6 +136,8 @@ namespace Explorer_and_Reader
             {
                 try
                 {
+                    Console.WriteLine($"path {path.Length}\t dirList {dirList.Length}");
+                    Console.WriteLine($"pathIndex {1+pathIndex}\t num {num}");
                     path[++pathIndex] = dirList[num]; //!!! выходит за границы массива 
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
                     FileList(PathLinker(pathIndex));
@@ -160,8 +160,14 @@ namespace Explorer_and_Reader
                     pathIndexBackup = pathIndex;
                     // разделить путь "р" на состовляющие и узнать новый "pathIndex"
                     // записать поверх путь из "р" в "path[]"
-                    path = p.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-                    pathIndex = path.Length - 1;
+                    path = new string[1000];
+                    int tempIndex = 0;
+                    string[] temp = p.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                    pathIndex = temp.Length - 1;
+                    foreach (string s in temp)
+                    {
+                        path[tempIndex++] = s;
+                    }
 
                     Console.WriteLine($"Открытие {PathLinker(pathIndex)}...");
                     FileList(PathLinker(pathIndex));
