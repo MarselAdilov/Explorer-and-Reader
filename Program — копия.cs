@@ -66,7 +66,6 @@ namespace Explorer_and_Reader
             FileList(PathLinker(pathIndex));
 
         }
-
         private static void Request(string command) //обрабатывает введенную команду
         {
             try
