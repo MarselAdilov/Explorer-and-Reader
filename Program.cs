@@ -264,6 +264,22 @@ namespace Explorer_and_Reader
                         break;
 
                     case "fb2":
+                        Console.WriteLine("Вывести документ полностью [Enter] или по частям [0]?");
+                        Console.Write("> ");
+                        string req = Console.ReadLine();
+                        bool partly = false;
+                        try
+                        {
+                            char symbol = req[0];
+                            if (symbol == '0')
+                                partly = true;
+                        }
+                        catch
+                        {
+                            //Console.WriteLine("Ошибка. Попробуйте снова.");
+                            //goto ERROR1;
+                            //return;
+                        }
                         XElement doc = XElement.Load(filePath);
 
                         //Вывод "шапки"
@@ -323,6 +339,7 @@ namespace Explorer_and_Reader
                             $"Серия: {sequence}\nАннотация: {annotation}\nДата: {year}\nid: {id}\n");
 
                         //Вывод "тушки"
+                        int loop = 0; //для вывода документа по частям
                         var body = doc.Elements().First(x =>
                             x.Name.LocalName == "body").Elements();
                         foreach (var item in body)
@@ -336,27 +353,51 @@ namespace Explorer_and_Reader
                                             foreach (var el_title in el.Elements())
                                             {
                                                 if (el_title.Name.LocalName == "p")
+                                                {
                                                     Console.WriteLine($"\t{el_title.Value.ToUpper()}");
+                                                    loop += (Convert.ToString(el_title.Value)).Length;
+                                                }
                                             }
                                             break;
                                         case "epigraph":
                                             foreach (var el_epigraph in el.Elements())
                                             {
                                                 if (el_epigraph.Name.LocalName == "p")
+                                                {
                                                     Console.WriteLine(el_epigraph.Value);
+                                                    loop += (Convert.ToString(el_epigraph.Value)).Length;
+                                                }
                                             }
                                             break;
                                         case "cite":
                                             foreach (var el_cite in el.Elements())
                                             {
                                                 if (el_cite.Name.LocalName == "p")
+                                                {
                                                     Console.WriteLine(el_cite.Value);
+                                                    loop += (Convert.ToString(el_cite.Value)).Length;
+                                                }
                                             }
                                             break;
-                                        case "p": Console.WriteLine($"   {el.Value}"); break;
-                                        case "empty-line": Console.WriteLine("\n"); break;
-                                        case "empty-line/": Console.WriteLine("\n"); break;
+                                        case "p": 
+                                            Console.WriteLine($"   {el.Value}");
+                                            loop += (Convert.ToString(el.Value)).Length;
+                                            break; 
+                                        case "empty-line": 
+                                            Console.WriteLine("\n");
+                                            loop += (Convert.ToString(el.Value)).Length;
+                                            break;
+                                        case "empty-line/":
+                                            Console.WriteLine("\n");
+                                            loop += (Convert.ToString(el.Value)).Length;
+                                            break;
                                         default: break;
+                                    }
+                                    if (loop > 1000 && partly)
+                                    {
+                                        Pause();
+                                        loop = 0;
+                                        //break;
                                     }
                                 }
 
@@ -365,7 +406,10 @@ namespace Explorer_and_Reader
                                 foreach (var el_title in item.Elements())
                                 {
                                     if (el_title.Name.LocalName == "p")
+                                    {
                                         Console.WriteLine($"\t{el_title.Value.ToUpper()}");
+                                        loop += (Convert.ToString(el_title.Value)).Length;
+                                    }
                                 }
                             }
                             if (item.Name.LocalName == "epigraph")
@@ -373,7 +417,10 @@ namespace Explorer_and_Reader
                                 foreach (var el_epigraph in item.Elements())
                                 {
                                     if (el_epigraph.Name.LocalName == "p")
+                                    {
                                         Console.WriteLine(el_epigraph.Value);
+                                        loop += (Convert.ToString(el_epigraph.Value)).Length;
+                                    }
                                 }
                             }
                             if (item.Name.LocalName == "cite")
@@ -381,16 +428,35 @@ namespace Explorer_and_Reader
                                 foreach (var el_cite in item.Elements())
                                 {
                                     if (el_cite.Name.LocalName == "p")
+                                    {
                                         Console.WriteLine(el_cite.Value);
+                                        loop += (Convert.ToString(el_cite.Value)).Length;
+                                    }
                                 }
                             }
 
                             if (item.Name.LocalName == "p")
+                            {
                                 Console.WriteLine(item.Value);
+                                loop += (Convert.ToString(item.Value)).Length;
+                            }
                             if (item.Name.LocalName == "empty-line")
+                            {
                                 Console.WriteLine(item.Value);
+                                loop += (Convert.ToString(item.Value)).Length;
+                            }
                             if (item.Name.LocalName == "empty-line/")
+                            {
                                 Console.WriteLine(item.Value);
+                                loop += (Convert.ToString(item.Value)).Length;
+                            }
+                            
+                            if (loop > 1000 && partly)
+                            {
+                                Pause();
+                                loop = 0;
+                                //break;
+                            }
                         }
                         break;
 
