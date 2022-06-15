@@ -31,7 +31,7 @@ namespace Explorer_and_Reader
 
             dirList = new string[1000];
             Console.WriteLine($"№\t{"Имя файла",-50}\tРазмер (байт)");
-            if (path != @"C:\") Console.WriteLine($"0.\tНазад\n");
+            if (path != @"C:\" && path != @"c:\" && path != @"C:" && path != @"c:") Console.WriteLine($"0.\tНазад\n");
 
             foreach (var d in dir)
             {
@@ -127,7 +127,7 @@ namespace Explorer_and_Reader
                             Open(num - 1);
                             return;
                         }
-                        else if (num == 0 && PathLinker(pathIndex) != @"C:\") // "назад"
+                        else if (num == 0 && PathLinker(pathIndex) != @"C:\" && PathLinker(pathIndex) != @"c:\" && PathLinker(pathIndex) != @"C:" && PathLinker(pathIndex) != @"c:") // "назад"
                         {
                             pathIndex--;
                             FileList(PathLinker(pathIndex));
